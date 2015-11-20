@@ -93,6 +93,16 @@ func (c *Cipher) IVSize() int {
 	return int(C.EVP_CIPHER_iv_length_not_a_macro(c.ptr))
 }
 
+func (c *Cipher) BytesToKey(pass, salt []byte, iter int, digest *Digest) ([]byte, []byte, error) {
+	key := make([]byte, c.KeySize())
+	iv := make([]byte, c.BlockSize())
+	res := C.EVP_BytesToKey(c.ptr, digest.ptr, (*C.uchar)(&salt[0]), (*C.uchar)(&pass[0]), C.int(len(pass)), C.int(iter), (*C.uchar)(&key[0]), (*C.uchar)(&iv[0]))
+	if res == 0 {
+		return nil, nil, fmt.Errorf("failed to create bytes")
+	}
+	return key, iv, nil
+}
+
 func Nid2ShortName(nid NID) (string, error) {
 	sn := C.OBJ_nid2sn(C.int(nid))
 	if sn == nil {
