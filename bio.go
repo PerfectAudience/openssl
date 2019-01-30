@@ -16,52 +16,52 @@
 
 package openssl
 
-/*
-#include <string.h>
-#include <openssl/bio.h>
 
-extern int cbioNew(BIO *b);
-static int cbioFree(BIO *b) {
-	return 1;
-}
+// #include <string.h>
+// #include <openssl/bio.h>
 
-extern int writeBioWrite(BIO *b, char *buf, int size);
-extern long writeBioCtrl(BIO *b, int cmd, long arg1, void *arg2);
-static int writeBioPuts(BIO *b, const char *str) {
-    return writeBioWrite(b, (char*)str, (int)strlen(str));
-}
+// extern int cbioNew(BIO *b);
+// static int cbioFree(BIO *b) {
+// 	return 1;
+// }
 
-extern int readBioRead(BIO *b, char *buf, int size);
-extern long readBioCtrl(BIO *b, int cmd, long arg1, void *arg2);
+// extern int writeBioWrite(BIO *b, char *buf, int size);
+// extern long writeBioCtrl(BIO *b, int cmd, long arg1, void *arg2);
+// static int writeBioPuts(BIO *b, const char *str) {
+//     return writeBioWrite(b, (char*)str, (int)strlen(str));
+// }
 
-static BIO_METHOD writeBioMethod = {
-    BIO_TYPE_SOURCE_SINK,
-    "Go Write BIO",
-    (int (*)(BIO *, const char *, int))writeBioWrite,
-    NULL,
-    writeBioPuts,
-    NULL,
-    writeBioCtrl,
-    cbioNew,
-    cbioFree,
-    NULL};
+// extern int readBioRead(BIO *b, char *buf, int size);
+// extern long readBioCtrl(BIO *b, int cmd, long arg1, void *arg2);
 
-static BIO_METHOD* BIO_s_writeBio() { return &writeBioMethod; }
+// static BIO_METHOD writeBioMethod = {
+//     BIO_TYPE_SOURCE_SINK,
+//     "Go Write BIO",
+//     (int (*)(BIO *, const char *, int))writeBioWrite,
+//     NULL,
+//     writeBioPuts,
+//     NULL,
+//     writeBioCtrl,
+//     cbioNew,
+//     cbioFree,
+//     NULL};
 
-static BIO_METHOD readBioMethod = {
-    BIO_TYPE_SOURCE_SINK,
-    "Go Read BIO",
-    NULL,
-    readBioRead,
-    NULL,
-    NULL,
-    readBioCtrl,
-    cbioNew,
-    cbioFree,
-    NULL};
+// static BIO_METHOD* BIO_s_writeBio() { return &writeBioMethod; }
 
-static BIO_METHOD* BIO_s_readBio() { return &readBioMethod; }
-*/
+// static BIO_METHOD readBioMethod = {
+//     BIO_TYPE_SOURCE_SINK,
+//     "Go Read BIO",
+//     NULL,
+//     readBioRead,
+//     NULL,
+//     NULL,
+//     readBioCtrl,
+//     cbioNew,
+//     cbioFree,
+//     NULL};
+
+// static BIO_METHOD* BIO_s_readBio() { return &readBioMethod; }
+
 import "C"
 
 import (
