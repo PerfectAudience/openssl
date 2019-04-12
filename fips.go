@@ -1,4 +1,4 @@
-// Copyright (C) 2015 Space Monkey, Inc.
+// Copyright (C) 2017. See AUTHORS.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+package openssl
+
+/*
 #include <openssl/ssl.h>
-#include <openssl/evp.h>
-#include "_cgo_export.h"
+*/
+import "C"
+import "runtime"
 
-int ticket_key_cb(SSL *s, unsigned char key_name[16],
-		unsigned char iv[EVP_MAX_IV_LENGTH],
-		EVP_CIPHER_CTX *cctx, HMAC_CTX *hctx, int enc) {
+// FIPSModeSet enables a FIPS 140-2 validated mode of operation.
+// https://wiki.openssl.org/index.php/FIPS_mode_set()
+func FIPSModeSet(mode bool) error {
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
 
-	SSL_CTX* ssl_ctx = SSL_get_SSL_CTX(s);
-	void* p = SSL_CTX_get_ex_data(ssl_ctx, get_ssl_ctx_idx());
-	// get the pointer to the go Ctx object and pass it back into the thunk
-	return ticket_key_cb_thunk(p, s, key_name, iv, cctx, hctx, enc);
+	var r C.int
+	if mode {
+		r = C.FIPS_mode_set(1)
+	} else {
+		r = C.FIPS_mode_set(0)
+	}
+	if r != 1 {
+		return errorFromErrorQueue()
+	}
+	return nil
 }
