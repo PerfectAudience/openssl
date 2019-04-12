@@ -23,68 +23,61 @@ import (
 	"unsafe"
 )
 
-type SHA1Hash struct {
+type MD5Hash struct {
 	ctx    *C.EVP_MD_CTX
 	engine *Engine
 }
 
-func NewSHA1Hash() (*SHA1Hash, error) { return NewSHA1HashWithEngine(nil) }
+func NewMD5Hash() (*MD5Hash, error) { return NewMD5HashWithEngine(nil) }
 
-func NewSHA1HashWithEngine(e *Engine) (*SHA1Hash, error) {
-	hash := &SHA1Hash{engine: e}
+func NewMD5HashWithEngine(e *Engine) (*MD5Hash, error) {
+	hash := &MD5Hash{engine: e}
 	hash.ctx = C.X_EVP_MD_CTX_new()
 	if hash.ctx == nil {
-		return nil, errors.New("openssl: sha1: unable to allocate ctx")
+		return nil, errors.New("openssl: md5: unable to allocate ctx")
 	}
-	runtime.SetFinalizer(hash, func(hash *SHA1Hash) { hash.Close() })
+	runtime.SetFinalizer(hash, func(hash *MD5Hash) { hash.Close() })
 	if err := hash.Reset(); err != nil {
 		return nil, err
 	}
 	return hash, nil
 }
 
-func (s *SHA1Hash) Close() {
+func (s *MD5Hash) Close() {
 	if s.ctx != nil {
 		C.X_EVP_MD_CTX_free(s.ctx)
 		s.ctx = nil
 	}
 }
 
-func engineRef(e *Engine) *C.ENGINE {
-	if e == nil {
-		return nil
-	}
-	return e.e
-}
-
-func (s *SHA1Hash) Reset() error {
-	if 1 != C.X_EVP_DigestInit_ex(s.ctx, C.X_EVP_sha1(), engineRef(s.engine)) {
-		return errors.New("openssl: sha1: cannot init digest ctx")
+func (s *MD5Hash) Reset() error {
+	if 1 != C.X_EVP_DigestInit_ex(s.ctx, C.X_EVP_md5(), engineRef(s.engine)) {
+		return errors.New("openssl: md5: cannot init digest ctx")
 	}
 	return nil
 }
 
-func (s *SHA1Hash) Write(p []byte) (n int, err error) {
+func (s *MD5Hash) Write(p []byte) (n int, err error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
 	if 1 != C.X_EVP_DigestUpdate(s.ctx, unsafe.Pointer(&p[0]),
 		C.size_t(len(p))) {
-		return 0, errors.New("openssl: sha1: cannot update digest")
+		return 0, errors.New("openssl: md5: cannot update digest")
 	}
 	return len(p), nil
 }
 
-func (s *SHA1Hash) Sum() (result [20]byte, err error) {
+func (s *MD5Hash) Sum() (result [16]byte, err error) {
 	if 1 != C.X_EVP_DigestFinal_ex(s.ctx,
 		(*C.uchar)(unsafe.Pointer(&result[0])), nil) {
-		return result, errors.New("openssl: sha1: cannot finalize ctx")
+		return result, errors.New("openssl: md5: cannot finalize ctx")
 	}
 	return result, s.Reset()
 }
 
-func SHA1(data []byte) (result [20]byte, err error) {
-	hash, err := NewSHA1Hash()
+func MD5(data []byte) (result [16]byte, err error) {
+	hash, err := NewMD5Hash()
 	if err != nil {
 		return result, err
 	}
